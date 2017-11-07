@@ -1,12 +1,15 @@
-1.  TODO
-2.  TODO
-3.  TODO
-4.  TODO
-5.  TODO
-6.  TODO
-7.  TODO
-8.  TODO
-9.  TODO
-10. TODO
-11. TODO
-12. TODO
+1.  stdint.h is a library that defines a variety of integer types. The attributes include signed/unsigned,
+    exact-width/minimum-width, integers wide enough to hold pointers, and others.
+2.  We use these standardized integer types because different hardware would otherwise handle an "int" differently.
+3.  BYTE: 1 byte  DWORD: 4 bytes  LONG: 8 bytes   WORD: 2 bytes
+4.  424d (hexadecimal)
+5.  biSize is the number of bytes required by the bitmapinfoheader structure, while bfSize is the size of the bitmap
+    file in bytes
+6.  if BiHeight is negative, the image starts in the upper left corner and is a top down bitmap
+7.  biBitCount specifies the BMP’s color depth, and the value range is from 0 to 32 (but not all values are used)
+8.  In line 24, NULL might be returned if the file does not match a valid filename, if the file is corrupt, or
+    otherwise cannot be opened. In line 32, NULL might be returned if the file cannot be created.
+9.  The third argument to fread is always '1' in this code because we always want to ready just one byte at a time.
+10. The value assigned to padding would be 3.
+11. fseek skips over padding by moving the file pointer position
+12. SEEK_CUR is a constant that refers to the current location in the file.
