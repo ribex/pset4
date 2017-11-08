@@ -39,6 +39,13 @@ int main(int argc, char *argv[])
         return 3;
     }
 
+    // explanation and usage of fread:
+    // fread(data, size, number, inptr);
+    // data: pointer to a struct that will contain the bytes being read
+    // size: size of each element to read (see sizeof)
+    // number: number of elements to read
+    // inptr: FILE * to read from
+
     // read infile's BITMAPFILEHEADER
     BITMAPFILEHEADER bf;
     fread(&bf, sizeof(BITMAPFILEHEADER), 1, inptr);
@@ -81,13 +88,27 @@ int main(int argc, char *argv[])
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
             // change pixel's color as necessary
-
+            // make a green pixel
+            // RGBTRIPLE triple;
+            // triple.rgbtBlue = 0x00;
+            // triple.rgbtGreen = 0xff;
+            // triple.rgbtRed = 0x00;
+            // if (triple.rgbtBlue == 0xff)
+            // change only pure red pixels (0000ff -> ffffff)
+            // boost green and/or blue ?
 
             // write verdict's scanline, pixel by pixel
             // write RGB triple to outfile
             fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
         }
 
+        // file position indicator
+        // fseek(inptr, offset, from);
+        // inptr: FILE * to seek over
+        // offset: number of bytes to move cursor
+        // from: SEEK_CUR (current position in file)
+        //      SEEK_SET (beginning of file)
+        //      SEEK_END (end of file)
         // skip over padding, if any
         fseek(inptr, padding, SEEK_CUR);
 
@@ -107,3 +128,10 @@ int main(int argc, char *argv[])
     // success
     return 0;
 }
+
+
+
+// if (pixels % 4 == 0), no padding
+// if (pixels % 4 == 3), 1 padding
+// if (pixels % 4 == 2), 2 padding
+// if (pixels % 4 == 1), 3 padding
