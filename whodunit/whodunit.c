@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     // ensure proper usage
     if (argc != 3)
     {
-        fprintf(stderr, "Usage: ./copy infile outfile\n");
+        fprintf(stderr, "Usage: ./whodunit infile outfile\n");
         return 1;
     }
 
@@ -93,9 +93,20 @@ int main(int argc, char *argv[])
             // triple.rgbtBlue = 0x00;
             // triple.rgbtGreen = 0xff;
             // triple.rgbtRed = 0x00;
-            // if (triple.rgbtBlue == 0xff)
-            // change only pure red pixels (0000ff -> ffffff)
-            // boost green and/or blue ?
+
+            // change only pure red pixels to white (0000ff -> ffffff)
+            if (triple.rgbtBlue == 0x00 && triple.rgbtGreen == 0x00 && triple.rgbtRed == 0xff)
+            {
+                triple.rgbtBlue = 0xff;
+                triple.rgbtGreen = 0xff;
+            }
+            // change all white pixels to black
+            if (triple.rgbtRed == 0xff && triple.rgbtGreen == 0xff && triple.rgbtBlue == 0xff)
+            {
+                triple.rgbtBlue = 0x00;
+                triple.rgbtGreen = 0x00;
+                triple.rgbtRed = 0x00;
+            }
 
             // write verdict's scanline, pixel by pixel
             // write RGB triple to outfile
