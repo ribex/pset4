@@ -57,6 +57,19 @@ int main(int argc, char *argv[])
         return 4;
     }
 
+    // calculate the new width and height of the output image
+    int outBiBiWidth = bi.biWidth * n;
+    int outBiBiHeight = bi.biHeight * n;
+
+    // calculate padding for the outfile
+    int outpadding = (4 - (outBiBiWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+
+    // calculate the output file's biSizeImage
+    bi.biSizeImage = ((sizeof(RGBTRIPLE) * outBiBiWidth) + outpadding) * abs(outBiBiHeight);
+
+    // calculate the output file's bfSize
+    bf.bfSize = bi.biSizeImage + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
     // write outfile's BITMAPFILEHEADER
     fwrite(&bf, sizeof(BITMAPFILEHEADER), 1, outptr);
 
@@ -66,9 +79,17 @@ int main(int argc, char *argv[])
     // determine padding for scanlines
     int padding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
 
+    // oldpadding
+    // newpadding
+
     // iterate over infile's scanlines
     for (int i = 0, biHeight = abs(bi.biHeight); i < biHeight; i++)
     {
+        // store this and write 'n' times after iterating through each pixel per line ? 8:32 in video
+        // remember pixels in an array and rewrite array as many times as needed
+        // or
+        // go back to the start of the original scanline and recopy the scanline
+
         // iterate over pixels in scanline
         for (int j = 0; j < bi.biWidth; j++)
         {
@@ -78,8 +99,13 @@ int main(int argc, char *argv[])
             // read RGB triple from infile
             fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
-            // write RGB triple to outfile
-            fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+
+            // write the pixel 'n' times
+            for (int k = 0; k < n; k++)
+            {
+                // write RGB triple to outfile
+                fwrite(&triple, sizeof(RGBTRIPLE), 1, outptr);
+            }
         }
 
         // skip over padding, if any
