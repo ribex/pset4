@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "bmp.h"
 #include <cs50.h>
 
-typedef struct {
-    BYTE bytearray[512];
-}
-BUFFER;
+typedef uint8_t  BYTE;
 
 int main(int argc, char *argv[])
 {
@@ -17,10 +13,9 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: ./recover filename\n");
         return 1;
     }
+    BYTE buffer[512];
 
     char *infile = argv[1];
-
-    // printf("infile: %s\n", infile);
 
     // open memory card file
     FILE *inptr = fopen(infile, "r");
@@ -33,15 +28,13 @@ int main(int argc, char *argv[])
 
     int filenumber = 0;
 
-    BUFFER buffer;
-
     FILE *image = NULL;
     bool found = false;
 
     char file[8];
     char *filename = file;
 
-    while (fread(&buffer, sizeof(BYTE), 1, inptr) == 1)
+    while (fread(&buffer, sizeof(buffer), 1, inptr) == 1)
     {
         if (feof(inptr))
         {
@@ -50,9 +43,9 @@ int main(int argc, char *argv[])
         }
 
         // if at the start of a new jpg
-        if ((buffer.bytearray[0] == 0xff) && (buffer.bytearray[1] == 0xd8) && (buffer.bytearray[2] == 0xff) && ((buffer.bytearray[3] >= 0xe0) && (buffer.bytearray[3] <= 0xef)))
+        if ((buffer[0] == 0xff) && (buffer[1] == 0xd8) && (buffer[2] == 0xff) && ((buffer[3] & 0xf0) == 0xe0))
         {
-            printf("Found a jpg!\n");
+            // printf("Found a jpg!\n");
             found = true;
 
             // if we haven't found a jpg yet
@@ -61,10 +54,9 @@ int main(int argc, char *argv[])
                 // start first jpg
                 // open a new jpg file to write to
                 // ###.jpg starting 000
-
                 sprintf(filename, "%.3d.jpg", filenumber);
                 image = fopen(filename, "a");
-                fwrite(&buffer, sizeof(BUFFER), 1, image);
+                fwrite(&buffer, sizeof(buffer), 1, image);
                 filenumber++;
             }
 
@@ -74,11 +66,9 @@ int main(int argc, char *argv[])
                 fclose(image);
                 sprintf(filename, "%.3d.jpg", filenumber);
                 image = fopen(filename, "w");
-                fwrite(&buffer, sizeof(BUFFER), 1, image);
+                fwrite(&buffer, sizeof(buffer), 1, image);
                 filenumber++;
             }
-            // open a new jpg file to write to
-            // ###.jpg starting (higher than 000)
         }
         // if not at the start of a new jpg
         else
@@ -87,33 +77,20 @@ int main(int argc, char *argv[])
             if (found == true)
             {
                 // write buffer to file
-                fwrite(&buffer, sizeof(BUFFER), 1, image);
+                fwrite(&buffer, sizeof(buffer), 1, image);
             }
+            // discard and go to start of loop
             // else
-                // discard and go to start of loop
-            else
-            {
-                printf("Not in a jpg yet\n");
-            }
+            // {
+            //     printf("Not in a jpg yet\n");
+            // }
         }
-
-
-
-        // char *filename = "";
-        // sprintf(filename, "%03i.jpg", filenumber);
-        // FILE *img = fopen(filename, "w");
-
-
-
-        // fclose(image);
     }
 
-    if ((fread(&buffer, sizeof(BUFFER), 1, inptr)) == 0)
+    if ((fread(&buffer, sizeof(buffer), 1, inptr)) == 0)
     {
         return 0;
     }
-
-    // detect end of file (block < 512 bytes)
 
     // close input file
     fclose(inptr);
